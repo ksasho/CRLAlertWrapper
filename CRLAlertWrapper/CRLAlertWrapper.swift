@@ -242,26 +242,18 @@ class CRLAlertWrapper: NSObject, UIAlertViewDelegate, UIActionSheetDelegate {
         actionSheet.showInView(getViewController().view)
     }
     
-    private func getViewController(rootViewController :UIViewController? = nil) -> UIViewController {
-        var tmpViewController :UIViewController
-        if let rootVC = rootViewController {
-            tmpViewController = rootVC
+    private func getViewController(rootViewController :UIViewController = UIApplication.sharedApplication().keyWindow!.rootViewController!) -> UIViewController {
+        if rootViewController is UITabBarController {
+            return getViewController(rootViewController: (rootViewController as UITabBarController).selectedViewController!)
         }
-        else {
-            tmpViewController = UIApplication.sharedApplication().keyWindow!.rootViewController!
+        else if rootViewController is UINavigationController {
+           return getViewController(rootViewController: (rootViewController as UINavigationController).visibleViewController)
         }
-        
-        if tmpViewController is UITabBarController {
-            return getViewController(rootViewController: (tmpViewController as UITabBarController).selectedViewController)
-        }
-        else if tmpViewController is UINavigationController {
-            return getViewController(rootViewController: (tmpViewController as UINavigationController).visibleViewController)
-        }
-        else if let presentedViewController = tmpViewController.presentedViewController {
+        else if let presentedViewController = rootViewController.presentedViewController {
             return getViewController(rootViewController: presentedViewController)
         }
         
-        return tmpViewController
+        return rootViewController
     }
     
     private func releaseStrongSelf() {
